@@ -22,7 +22,7 @@ const Root = () => {
                     hiddenFrom="sm"
                     size="sm"
                 />
-                <div className="ml-2"><Title order={3}>Assignment Management</Title></div>
+                <div className="ml-2"><Title order={3}>notClassroom</Title></div>
             </AppShell.Header>
 
             <AppShell.Navbar p="md">Navbar</AppShell.Navbar>
