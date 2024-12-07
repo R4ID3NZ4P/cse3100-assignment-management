@@ -8,6 +8,7 @@ import { AuthContext } from "../contexts/AuthContext";
 const AuthProvider = ({ children }: {children: React.ReactNode}) => {
     const [user, setUser] = useState<typeof auth.currentUser>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isStudent, setIsStudent] = useState<boolean | null>(null);
     
     const login = (email: string, password: string) => {
         setLoading(true);
@@ -44,8 +45,13 @@ const AuthProvider = ({ children }: {children: React.ReactNode}) => {
     }
 
     useEffect( () => {
-        const unSubscribe = onAuthStateChanged(auth, currentUser => {
+        const unSubscribe = onAuthStateChanged(auth, async currentUser => {
             setUser(currentUser);
+            if(currentUser) {
+                const userRes = await fetch(`http://localhost:5000/user/${currentUser.email}`);
+                const userTemp = await userRes.json();
+                setIsStudent(userTemp.student);
+            }
             setLoading(false);
         })
 
@@ -59,7 +65,8 @@ const AuthProvider = ({ children }: {children: React.ReactNode}) => {
         user,
         loading,
         update,
-        googleLogin
+        googleLogin,
+        isStudent
     };
 
     return (

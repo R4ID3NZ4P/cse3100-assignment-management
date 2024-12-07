@@ -18,10 +18,11 @@ import useAuth from "../../hooks/useAuth";
 import { Navigate, useLocation, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { FirebaseError } from "firebase/app";
+import { getAdditionalUserInfo } from "firebase/auth";
 
 export const Login = (props: PaperProps) => {
     const [type, toggle] = useToggle(["login", "register"]);
-    const { user, login, register, update } = useAuth()!;
+    const { user, login, register, update, googleLogin } = useAuth()!;
     const form = useForm({
         initialValues: {
             email: "",
@@ -47,7 +48,7 @@ export const Login = (props: PaperProps) => {
         const email = values.email;
         const password = values.password;
         const name = values.name;
-        // const student = values.student;
+        const student = values.student;
 
         if (type == "register") {
             console.log(values);
@@ -55,9 +56,25 @@ export const Login = (props: PaperProps) => {
             try {
             const regRes = await register(email, password);
             console.log(regRes);
+            const dbRes = await fetch("http://localhost:5000/adduser", {
+                headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  method: "POST",
+                  body: JSON.stringify({email, name, student})
+            });
+            console.log(dbRes);
             await update(name);
             } catch (error) {
               console.error(error);
+              if((error as FirebaseError).code === "auth/email-already-in-use") {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Email already in use!',
+                    icon: 'error',
+                    confirmButtonText: 'Close'
+                  })
+              }
             }
         } else {
             console.log({ email, password });
@@ -92,16 +109,76 @@ export const Login = (props: PaperProps) => {
         }
     };
 
+    const handleGoogleLogin = async () => {
+        try {
+            const res = await googleLogin();
+            // console.log(res);
+            const {isNewUser} = getAdditionalUserInfo(res)!;
+            // console.log(isNewUser);
+            if(isNewUser) {
+                let student: boolean | null = true;
+                const name = res.user?.displayName;
+                const email = res.user?.email;
+                const inputOptions = new Promise((resolve) => {
+                    setTimeout(() => {
+                      resolve({
+                        "true": "Student",
+                        "false": "Teacher"
+                      });
+                    }, 1000);
+                  });
+                  const { value: choice } = await Swal.fire({
+                    title: "I am a",
+                    input: "radio",
+                    inputOptions,
+                    inputValidator: (value) => {
+                      if (!value) {
+                        return "You need to choose something!";
+                      }
+                    }
+                  });
+                  if (choice) {
+                    student = choice === "true";
+                  }
+
+                  console.log(name, student, typeof student);
+
+                  const dbRes = await fetch("http://localhost:5000/adduser", {
+                    headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      method: "POST",
+                      body: JSON.stringify({email, name, student})
+                });
+
+                console.log(dbRes);
+            }
+            Swal.fire({
+                position: "top",
+                icon: "success",
+                title: `Logged In Successfully`,
+                showConfirmButton: false,
+                timer: 1500,
+            });
+            if(location.state) navigate(location.state)
+            else navigate("/");
+        }
+        catch(error) {
+        console.error(error);
+        }
+    }
+
     if (user) return <Navigate to={"/"}></Navigate>;
 
     return (
-        <Paper radius="md" p="xl" withBorder {...props}>
+        <div className="w-full flex justify-center">
+        <Paper maw={"600"} w={'100%'} radius="md" p="xl" withBorder {...props}>
             <Text size="lg" fw={500}>
                 Welcome to notClassroom, {type} with
             </Text>
 
             <Group grow mb="md" mt="md">
-                <GoogleButton radius="xl">Google</GoogleButton>
+                <GoogleButton onClick={handleGoogleLogin} radius="xl">Google</GoogleButton>
             </Group>
 
             <Divider
@@ -114,6 +191,7 @@ export const Login = (props: PaperProps) => {
                 <Stack>
                     {type === "register" && (
                         <TextInput
+                            required
                             label="Name"
                             placeholder="Your name"
                             value={form.values.name}
@@ -130,7 +208,7 @@ export const Login = (props: PaperProps) => {
                     <TextInput
                         required
                         label="Email"
-                        placeholder="hello@mantine.dev"
+                        placeholder="hello@abc.dev"
                         value={form.values.email}
                         onChange={(event) =>
                             form.setFieldValue(
@@ -205,5 +283,6 @@ export const Login = (props: PaperProps) => {
                 </Group>
             </form>
         </Paper>
+        </div>
     );
 };

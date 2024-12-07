@@ -14,4 +14,25 @@ export interface AuthContextType {
     loading: boolean;
     update: (name: string | null, photo?: string | null) => Promise<void>;
     googleLogin: () => Promise<UserCredential>;
+    isStudent: boolean | null;
+}
+
+export interface RoomType {  
+    _id: string;
+    roomName: string;
+    description: string;
+    owner: string;
+    members: string[];
+}
+
+export interface AssignmentType {  
+    _id: string;
+    title: string;
+    description: string;
+    createdBy: string;
+    roomId: string;
+}
+
+export interface RoomAssignmentType extends RoomType {
+    assignments: AssignmentType[];
 }

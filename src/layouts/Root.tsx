@@ -1,9 +1,12 @@
 import { AppShell, Burger, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Outlet } from "react-router";
+// import useAuth from "../hooks/useAuth";
+import Navbar from "../shared/Navbar";
 
 const Root = () => {
     const [opened, { toggle }] = useDisclosure();
+    // const { user, logout, isStudent } = useAuth()!;
 
     return (
         <AppShell
@@ -22,12 +25,18 @@ const Root = () => {
                     hiddenFrom="sm"
                     size="sm"
                 />
-                <div className="ml-2"><Title order={3}>notClassroom</Title></div>
+                <div className="ml-2">
+                    <Title order={3}>notClassroom</Title>
+                </div>
             </AppShell.Header>
 
-            <AppShell.Navbar p="md">Navbar</AppShell.Navbar>
+            <AppShell.Navbar p="md">
+                <Navbar></Navbar>
+            </AppShell.Navbar>
 
-            <AppShell.Main><Outlet/></AppShell.Main>
+            <AppShell.Main>
+                <Outlet />
+            </AppShell.Main>
         </AppShell>
     );
 };
