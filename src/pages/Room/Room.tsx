@@ -26,7 +26,7 @@ const Room = () => {
     return (
         <Container>
             {!isStudent && <Group justify="end">
-                <CreateAssignment data={getData} />
+                <CreateAssignment refresh={getData} />
             </Group>}
             <Stack mt={16}>
                 {data?.assignments.map((item, idx) => <AssignmentCard data={item} key={idx} />)}

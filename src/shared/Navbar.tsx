@@ -1,7 +1,6 @@
 import { Button, NavLink, Stack, Title } from "@mantine/core";
 import { useLocation, useNavigate } from "react-router";
 import useAuth from "../hooks/useAuth";
-import CreateRoom from "./CreateRoom";
 
 const Navbar = () => {
 
@@ -30,7 +29,6 @@ const Navbar = () => {
                     </>
                 )}
                 <Button variant="default">3</Button>
-                <CreateRoom/>
             </Stack>
         </div>
     );

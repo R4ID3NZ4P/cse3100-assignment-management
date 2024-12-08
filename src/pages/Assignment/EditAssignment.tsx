@@ -4,9 +4,10 @@ import { useDisclosure } from "@mantine/hooks";
 import Swal from "sweetalert2";
 import useAuth from "../../hooks/useAuth";
 import { useParams } from "react-router";
-import { FaPlus } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
+import { AssignmentType } from "../../@types/types";
 
-const CreateAssignment = ( { refresh }: { refresh: () => Promise<void> } ) => {
+const EditAssignment = ( { refresh, data }: { refresh: () => Promise<void>, data: AssignmentType } ) => {
     const [opened, { open, close }] = useDisclosure(false);
     const { user, loading } = useAuth()!;
     const { roomid } = useParams();
@@ -16,13 +17,14 @@ const CreateAssignment = ( { refresh }: { refresh: () => Promise<void> } ) => {
     const form = useForm({
         mode: "uncontrolled",
         initialValues: {
-            title: "",
-            description: "",
+            title: data.title,
+            description: data.description,
         }
     });
 
     const handleSubmit = async (values: typeof form.values) => {
         const subInfo = {
+            _id: data._id,
             title: values.title,
             description: values.description,
             createdBy: user?.email,
@@ -32,11 +34,11 @@ const CreateAssignment = ( { refresh }: { refresh: () => Promise<void> } ) => {
         console.log(subInfo);
 
         try {
-            const res = await fetch("http://localhost:5000/createassignment", {
+            const res = await fetch("http://localhost:5000/editassignment", {
                 headers: {
                     'Content-Type': 'application/json'
                   },
-                  method: "POST",
+                  method: "PUT",
                   body: JSON.stringify(subInfo)
             });
             const resJson = await res.json();
@@ -44,7 +46,7 @@ const CreateAssignment = ( { refresh }: { refresh: () => Promise<void> } ) => {
             Swal.fire({
                 position: "top",
                 icon: "success",
-                title: `Assignment Created Successfully`,
+                title: `Assignment Edited Successfully`,
                 showConfirmButton: false,
                 timer: 1000,
             });
@@ -60,7 +62,7 @@ const CreateAssignment = ( { refresh }: { refresh: () => Promise<void> } ) => {
 
     return (
         <>
-            <Modal opened={opened} onClose={close} title="Create Assignment">
+            <Modal opened={opened} onClose={close} title="Edit Assignment">
                 {!loading ? <form onSubmit={form.onSubmit(handleSubmit)}>
                     <TextInput
                         withAsterisk
@@ -71,12 +73,12 @@ const CreateAssignment = ( { refresh }: { refresh: () => Promise<void> } ) => {
                     />
 
                     <Textarea
+                        autosize
                         withAsterisk
                         label="Assignment Description"
                         placeholder="What is the purpose???"
                         key={form.key("description")}
                         {...form.getInputProps("description")}
-                        autosize
                     />
 
                     <Group justify="flex-end" mt="md">
@@ -85,9 +87,9 @@ const CreateAssignment = ( { refresh }: { refresh: () => Promise<void> } ) => {
                 </form> : <Title>Loading</Title>}
             </Modal>
 
-            <Button rightSection={<FaPlus size={14} />} onClick={open}>Create Assignment</Button>
+            <Button rightSection={<FaEdit size={14} />} onClick={open}>Edit Assignment</Button>
         </>
     );
 };
 
-export default CreateAssignment;
+export default EditAssignment;

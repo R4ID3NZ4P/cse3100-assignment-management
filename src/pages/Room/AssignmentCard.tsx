@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import { AssignmentType } from '../../@types/types';
-import { Card, Text } from '@mantine/core';
+import { Card, Group, Text } from '@mantine/core';
+import { FaAngleRight } from 'react-icons/fa';
 
 const AssignmentCard = ( { data } : { data: AssignmentType} ) => {
 
@@ -19,8 +20,10 @@ const AssignmentCard = ( { data } : { data: AssignmentType} ) => {
             </Text>
 
             <Text mt="s" c="dimmed" size="sm">
-                {data.description}
+                {data.description.slice(0, 50)} ...
             </Text>
+
+            <Group justify='end'><FaAngleRight size={28}/></Group>
 
             {/* <Text mt="xs" c="dimmed" size="sm">
                 {data.}

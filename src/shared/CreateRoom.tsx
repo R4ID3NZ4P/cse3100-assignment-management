@@ -3,8 +3,9 @@ import { Modal, Button, TextInput, Group, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import useAuth from "../hooks/useAuth";
 import Swal from "sweetalert2";
+import { FaPlus } from "react-icons/fa";
 
-const CreateRoom = () => {
+const CreateRoom = ({ refresh }: {refresh: () => Promise<void>}) => {
     const [opened, { open, close }] = useDisclosure(false);
     const { user, loading } = useAuth()!;
     console.log(user?.email);
@@ -44,6 +45,8 @@ const CreateRoom = () => {
                 timer: 1000,
             });
 
+            refresh();
+
         } catch (error) {
             console.error(error);
         }
@@ -77,7 +80,7 @@ const CreateRoom = () => {
                 </form> : <Title>Loading</Title>}
             </Modal>
 
-            <Button onClick={open}>Create Room</Button>
+            <Button rightSection={<FaPlus size={14}/>} onClick={open}>Create Room</Button>
         </>
     );
 };
