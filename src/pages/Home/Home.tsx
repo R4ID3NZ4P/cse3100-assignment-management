@@ -1,8 +1,6 @@
-import { Navigate, NavLink } from "react-router";
+import { Navigate } from "react-router";
 import useAuth from "../../hooks/useAuth";
 import {
-    Anchor,
-    Breadcrumbs,
     Container,
     Group,
     Image,
