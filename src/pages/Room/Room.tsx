@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { RoomAssignmentType } from "../../@types/types";
-import { useNavigate, useParams } from "react-router";
-import { Button, Container, Group, Stack } from "@mantine/core";
+import { NavLink, useNavigate, useParams } from "react-router";
+import { Anchor, Breadcrumbs, Button, Container, Group, Stack } from "@mantine/core";
 import useAuth from "../../hooks/useAuth";
 import CreateAssignment from "../CreateAssignment/CreateAssignment";
 import AssignmentCard from "./AssignmentCard";
@@ -63,11 +63,23 @@ const Room = () => {
         getData();
     }, []);
 
+    const items = [
+        { title: "Home", href: "/" },
+        { title: data?.roomName, href: "#" },
+    ].map((item, index) => (
+        <NavLink to={item.href} key={index}><Anchor>{item.title}</Anchor></NavLink>
+    ));
+
     return (
         <Container>
-            {!isStudent && <Group justify="end">
-                <Button onClick={handleDelete} color="red" rightSection={<FaBan size={14} />}>Delete Room</Button>
-                <CreateAssignment refresh={getData} />
+            {!isStudent && <Group justify="space-between">
+                <Breadcrumbs separator="/" separatorMargin="md" mt="xs">
+                    {items}
+                </Breadcrumbs>
+                <Group>
+                    <Button onClick={handleDelete} color="red" rightSection={<FaBan size={14} />}>Delete Room</Button>
+                    <CreateAssignment refresh={getData} />
+                </Group>
             </Group>}
             <Stack mt={16}>
                 {data?.assignments.map((item, idx) => <AssignmentCard data={item} key={idx} />)}
